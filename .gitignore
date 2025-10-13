@@ -1,0 +1,6 @@
+#Arquivos do sistema
+__pycache__
+venv
+
+#Arquivos de configuração
+.env
