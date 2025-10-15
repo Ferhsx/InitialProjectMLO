@@ -52,7 +52,7 @@ print("\nRelatório de classificação:")
 
 print(classification_report(y_test, y_pred))
 
-model_save_path = os.path.join('..', '..', 'models')
+model_save_path = os.path.join(os.path.dirname(__file__), '..', '..', 'models')
 
 os.makedirs(model_save_path, exist_ok=True)
 
