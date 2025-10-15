@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Oráculo de Combate</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="script.js"></script>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Oráculo de Combate</h1>
+        <p>Insira os dados do combate para prever a dificuldade.</p>
+
+        <form id="combat-form">
+            <div class="party-section">
+                <h2>Grupo dos Jogadores</h2>
+                <div class="form-group">
+                    <label for="num_player">Número de Jogadores</label>
+                    <input type="number" id="num_player" required>
+                </div>
+                <div class="form-group">
+                    <label for="num_level_players">Nível Médio dos Jogadores</label>
+                    <input type="number" id="num_level_players" required>
+                </div>
+                <div class="form-group">
+                    <label for="total_player_hp">Total de HP dos Jogadores</label>
+                    <input type="number" id="total_player_hp" required>
+                </div>
+                <div class="form-group">
+                    <label for="avg_player_ac">Média de CA dos Jogadores</label>
+                    <input type="number" id="avg_player_ac" required>
+                </div>
+                <div class="form-group">
+                    <label for="total_player_atk">Bônus de Ataque Total dos Jogadores</label>
+                    <input type="number" id="total_player_atk" required>
+                </div>
+            </div>
+
+            <div class="monster-section">
+                <h2>Grupo dos Monstros</h2>
+                <div class="form-group">
+                    <label for="num_enemy">Número de Monstros</label>
+                    <input type="number" id="num_enemy" required>
+                </div>
+                <div class="form-group">
+                    <label for="total_enemy_hp">Total de HP dos Monstros</label>
+                    <input type="number" id="total_enemy_hp" required>
+                </div>
+                <div class="form-group">
+                    <label for="avg_enemy_ac">Média de CA dos Monstros</label>
+                    <input type="number" id="avg_enemy_ac" required>
+                </div>
+                <div class="form-group">
+                    <label for="total_enemy_atk">Bônus de Ataque Total dos Monstros</label>
+                    <input type="number" id="total_enemy_atk" required>
+                </div>
+            </div>
+
+            <button type="submit">Analisar Dificuldade</button>
+        </form>
+
+        <div id="result-container" class="hidden">
+            <h2>Resultado da Análise</h2>
+            <p>Dificuldade: <span id="difficulty-result"></span></p>
+            <p>Chance de Vitória (Jogadores): <span id="probability-result"></span></p>
+        </div>
+    </div>
+</body>
+
+</html>
