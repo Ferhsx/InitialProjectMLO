@@ -1,60 +1,81 @@
+import os
+from pathlib import Path
 import pandas as pd
+import joblib
 from xgboost import XGBClassifier
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import accuracy_score, classification_report
-import joblib
-import os
-
-# Carregando o dataset
-Data_path = os.path.join('..', '..', 'data', 'dataset.csv')
-# Adicione estas linhas de depuração no seu train.py
-
-print("--- INÍCIO DA DEPURAÇÃO DE CAMINHO ---")
-
-# O caminho para o próprio script
-local_do_script = os.path.dirname(__file__)
-print(f"O script acredita que está em: {local_do_script}")
-
-# O caminho que você está construindo
-Data_path = os.path.join(local_do_script, '..', '..', 'data', 'dataset.csv')
-print(f"Caminho relativo construído para o CSV: {Data_path}")
-
-# Vamos ver a versão "absoluta" desse caminho
-caminho_absoluto = os.path.abspath(Data_path)
-print(f"Tentando carregar o arquivo de: {caminho_absoluto}")
-
-# Verifique se o arquivo realmente existe nesse caminho absoluto
-print(f"O arquivo existe neste caminho? -> {os.path.exists(caminho_absoluto)}")
-
-print("--- FIM DA DEPURAÇÃO DE CAMINHO ---")
-
-# A linha original que carrega o CSV (pode deixar como estava ou usar o caminho absoluto)
-df = pd.read_csv(Data_path)
+from sklearn.metrics import accuracy_score, classification_report, roc_auc_score
 
 
-print("Tudo ocorreu certo", df.head())
+def add_derived_features(df: pd.DataFrame) -> pd.DataFrame:
+    # Evita divisão por zero
+    df = df.copy()
+    df['hp_ratio'] = df['total_player_hp'] / (df['total_enemy_hp'] + 1)
+    df['atk_diff'] = df['total_player_atk'] - df['total_enemy_atk']
+    df['ac_diff'] = df['avg_player_ac'] - df['avg_enemy_ac']
+    df['num_ratio'] = df['num_player'] / (df['num_enemy'] + 1)
+    df['damage_diff'] = df['total_player_damage'] - df['total_enemy_damage']
+    df['level_diff'] = df.get('level_players', 0) - df.get('level_enemies', 0)
+    df['avg_dmg_per_player'] = df['total_player_damage'] / df['num_player']
+    df['avg_dmg_per_enemy'] = df['total_enemy_damage'] / df['num_enemy']
+    # remova ou converta outcomes flutuantes para binário (0/1) se necessário
+    df = df[df['player_victory'].isin([0, 1])]
+    return df
 
-x = df.drop('player_victory', axis=1)
-y = df['player_victory']
 
-x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.2, random_state=42)
+def train_and_save(df: pd.DataFrame, model_out: str):
+    df = add_derived_features(df)
 
-print("Dados dividos")
+    target = 'player_victory'
+    X = df.drop(columns=[target])
+    y = df[target].astype(int)
 
-model = XGBClassifier(use_label_encoder=False, eval_metric='logloss')
-model.fit(x_train, y_train)
+    # Salva a ordem das features para a API
+    features_order = list(X.columns)
 
-y_pred = model.predict(x_test)
+    X_train, X_test, y_train, y_test = train_test_split(
+        X, y, test_size=0.2, random_state=42, stratify=y
+    )
 
-accuracy = accuracy_score(y_test, y_pred)
-print("Acurácia:", accuracy)
-print("\nRelatório de classificação:")
+    model = XGBClassifier(
+        n_estimators=200,
+        max_depth=6,
+        learning_rate=0.1,
+        subsample=0.8,
+        colsample_bytree=0.8,
+        use_label_encoder=False,
+        eval_metric='logloss',
+        random_state=42
+    )
 
-print(classification_report(y_test, y_pred))
+    model.fit(X_train, y_train)
 
-model_save_path = os.path.join(os.path.dirname(__file__), '..', '..', 'models')
+    y_pred = model.predict(X_test)
+    y_proba = model.predict_proba(X_test)[:, 1]
 
-os.makedirs(model_save_path, exist_ok=True)
+    acc = accuracy_score(y_test, y_pred)
+    auc = roc_auc_score(y_test, y_proba)
 
-joblib.dump(model, os.path.join(model_save_path, 'combat_model.joblib'))
-print(f"\nModelo salvo em: {model_save_path}/combat_model.joblib")  
+    print('Acurácia:', acc)
+    print('AUC:', auc)
+    print('\nRelatório de classificação:')
+    print(classification_report(y_test, y_pred))
+
+    # metadata com ordem de features e versão
+    metadata = {
+        'features_order': features_order,
+        'version': '1.0.0'
+    }
+
+    os.makedirs(os.path.dirname(model_out), exist_ok=True)
+    joblib.dump((model, metadata), model_out)
+    print('Modelo salvo em', model_out)
+
+
+if __name__ == '__main__':
+    base = Path(__file__).resolve().parent
+    data_path = base.joinpath('..', '..', 'data', 'dataset.csv')
+    model_out = base.joinpath('..', '..', 'models', 'combat_model.joblib')
+
+    df = pd.read_csv(data_path)
+    train_and_save(df, str(model_out))
