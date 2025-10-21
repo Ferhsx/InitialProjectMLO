@@ -9,14 +9,17 @@ document.addEventListener('DOMContentLoaded', () =>{
         
         const combatData = {
             num_player: parseInt(document.getElementById('num_player').value),
-            num_level_players: parseInt(document.getElementById('num_level_players').value),
+            level_players: parseInt(document.getElementById('level_players').value),
             total_player_hp: parseInt(document.getElementById('total_player_hp').value),
             avg_player_ac: parseFloat(document.getElementById('avg_player_ac').value),
             total_player_atk: parseInt(document.getElementById('total_player_atk').value),
+            total_player_damage: parseInt(document.getElementById('total_player_damage').value),
             num_enemy: parseInt(document.getElementById('num_enemy').value),
+            level_enemies: parseInt(document.getElementById('level_enemies').value),
             total_enemy_hp: parseInt(document.getElementById('total_enemy_hp').value),
             avg_enemy_ac: parseFloat(document.getElementById('avg_enemy_ac').value),
             total_enemy_atk: parseInt(document.getElementById('total_enemy_atk').value),
+            total_enemy_damage: parseInt(document.getElementById('total_enemy_damage').value),
         }
 
         try{
