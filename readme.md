@@ -1,43 +1,43 @@
-# ⚔️ Oráculo de Combate de RPG
+# ⚔️ Oráculo de Combate de RPG (v2.0)
 
-**Um projeto de Machine Learning para prever a dificuldade de encontros de combate em RPGs de mesa.**
+**Um projeto de Machine Learning full-stack que utiliza engenharia de features para prever a dificuldade de encontros de combate em RPGs de mesa.**
 
-Este projeto demonstra um ciclo completo de desenvolvimento de ML, desde a criação de dados sintéticos e treinamento de modelo até a implantação como um serviço de API full-stack.
+Este projeto demonstra um ciclo de vida completo de MLOps, desde a simulação de dados calibrados e treinamento de modelo com features derivadas, até a implantação como um serviço de API robusto consumido por uma interface web interativa.
+
+<p align="center">
+  <img src="URL_GIF_AQUI.gif" alt="Demonstração do Oráculo de Combate" width="80%">
+</p>
 
 ---
 
 ### ✨ Visão Geral
 
-O balanceamento de combate em sistemas como Dungeons & Dragons é um desafio notório para Mestres de Jogo. As diretrizes existentes são muitas vezes imprecisas, levando a combates frustrantes. O Oráculo de Combate resolve este problema usando um modelo de Machine Learning treinado para analisar as estatísticas de um encontro e prever sua dificuldade real com alta precisão.
-
-### 🚀 Demonstração Ao Vivo (Live Demo)
-
-
-<p align="center">
-  <img src="URL_PARA_GIF_AQUI.gif" alt="Demonstração do Oráculo de Combate que ainda não tem." width="80%">
-</p>
-
+O balanceamento de combate em sistemas como D&D 5e é um desafio notório para Mestres de Jogo. O Oráculo de Combate resolve este problema usando um modelo XGBoost que vai além das estatísticas básicas. Através da **engenharia de features**, o modelo aprende com as *relações* entre os combatentes (como a diferença de poder, a vantagem numérica e a proporção de HP), resultando em predições de dificuldade notavelmente precisas e intuitivas.
 
 ---
 
 ### 🛠️ Stack de Tecnologia
 
-Este projeto foi construído utilizando as seguintes tecnologias:
-
-*   **Backend:** Python, FastAPI, Uvicorn
+*   **Backend & API:** Python, FastAPI, Uvicorn
 *   **Machine Learning & Dados:** XGBoost, Scikit-learn, Pandas, Joblib
 *   **Frontend:** HTML5, CSS3, JavaScript (Vanilla)
-*   **Infraestrutura & Ferramentas:** Ambientes Virtuais (`venv`), Git
+*   **Ferramentas de Desenvolvimento:** Ambientes Virtuais (`venv`), Git, Argparse, Dataclasses
 
 ---
 
 ### ✅ Principais Funcionalidades
 
-*   **Previsão de Dificuldade:** Classifica os encontros em categorias como Trivial, Fácil, Médio, Difícil ou Mortal.
-*   **Cálculo de Probabilidade:** Fornece a probabilidade percentual de vitória para o grupo dos jogadores.
-*   **Interface Intuitiva:** Um formulário web simples para inserir os dados do combate sem necessidade de conhecimento técnico.
-*   **Modelo Customizado:** O modelo de previsão não é pré-pronto; ele foi treinado do zero a partir de dezenas de milhares de combates simulados.
-*   **Arquitetura Desacoplada:** Um frontend independente que consome uma API de backend, uma prática padrão da indústria.
+*   **Engenharia de Features Avançada:** O coração do projeto. O modelo não usa apenas dados brutos, mas aprende com features criadas para capturar a dinâmica do combate, como:
+    *   `hp_ratio`: A proporção de vitalidade entre jogadores e monstros.
+    *   `damage_diff`: A diferença no poder de fogo total por rodada.
+    *   `level_diff`: A disparidade de nível entre os dois grupos.
+    *   E muitas outras...
+*   **Simulação de Dados Calibrada:** O dataset foi gerado por um simulador customizado que cria encontros balanceados e variados, evitando o viés de dificuldade e garantindo que o modelo aprenda com uma ampla gama de cenários.
+*   **Previsão de Dificuldade e Probabilidade:** Classifica os encontros (Trivial, Fácil, Médio, Difícil, Mortal) e fornece a probabilidade de vitória dos jogadores.
+*   **Arquitetura Robusta:**
+    *   **Consistência Treino/Inferência:** A mesma lógica de engenharia de features é aplicada tanto no treinamento (`train.py`) quanto na API (`main.py`), evitando o *training-serving skew*.
+    *   **Metadados do Modelo:** O modelo é salvo junto com metadados cruciais (como a ordem das features), tornando a implantação mais segura e confiável.
+*   **Interface de Usuário Interativa:** Um frontend simples e eficiente para que qualquer usuário possa acessar o poder do modelo sem precisar de conhecimento técnico.
 
 ---
 
@@ -55,36 +55,35 @@ git clone https://github.com/seu-usuario/InitialProjectMLO.git
 cd InitialProjectMLO
 ```
 
-**2. Configure o Backend**
+**2. Configure o Ambiente**
 ```bash
 # Crie e ative um ambiente virtual
 python -m venv venv
-source venv/bin/activate # No Windows: .\venv\Scripts\activate
+# No Windows (PowerShell): .\venv\Scripts\activate
+# No Linux/macOS: source venv/bin/activate
 
 # Instale as dependências
 pip install -r requirements.txt
+```
 
-# Execute o servidor da API
+**3. Geração de Dados e Treinamento (Se necessário)**
+O repositório já inclui um modelo pré-treinado. Se quiser refazer o processo:
+```bash
+# Gere um novo dataset (pode levar alguns minutos)
+python src/data_creation/simulador.py --n 100000
+
+# Treine um novo modelo com o dataset gerado
+python src/model_training/train.py
+```
+
+**4. Inicie o Servidor da API**
+```bash
 uvicorn src.api.main:app --reload
 ```
-O servidor estará rodando em `http://1227.0.0.1:8000`.
+O servidor estará rodando em `http://127.0.0.1:8000`. Você pode testar os endpoints na documentação interativa em `http://127.0.0.1:8000/docs`.
 
-**3. Inicie o Frontend**
+**5. Inicie o Frontend**
 *   Navegue até a pasta `frontend` no seu explorador de arquivos.
 *   Abra o arquivo `index.html` no seu navegador.
 
-A aplicação estará totalmente funcional!
-
----
-
-### 📈 Possíveis Melhorias Futuras
-
-*   **Contas de Usuário:** Permitir que Mestres salvem seus grupos de jogadores e encontros de combate.
-*   **Ciclo de Feedback:** Implementar um sistema onde o Mestre possa informar o resultado real do combate para coletar novos dados e retreinar o modelo periodicamente.
-*   **Detalhes Avançados:** Adicionar campos para magias, habilidades especiais e condições do terreno para uma simulação mais rica.
-
----
-
-### 📜 Licença
-
-Distribuído sob a licença MIT. Veja `LICENSE` para mais informações.
+A aplicação estará totalmente funcional e pronta para uso!
