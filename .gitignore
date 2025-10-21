@@ -1,6 +1,15 @@
-#Arquivos do sistema
-__pycache__
-venv
+# Arquivos de Dependências e Ambiente Virtual
+venv/
+*.egg-info/
 
-#Arquivos de configuração
-.env
+# Arquivos de Cache do Python
+__pycache__/
+*.pyc
+
+# Artefatos do Projeto (O Bolo e os Ingredientes)
+data/dataset.csv
+models/combat_model.joblib
+
+# Arquivos de Configuração de IDE/Editor
+.vscode/
+.idea/
