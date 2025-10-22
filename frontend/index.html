@@ -2,84 +2,164 @@
 <html lang="pt-br">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Oráculo de Combate</title>
-    <link rel="stylesheet" href="style.css">
-    <script src="script.js"></script>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Oráculo de Combate</title>
+
+  <!-- Fonte de estilo fantasia (fallbacks inclusos) -->
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=IM+Fell+English:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="style.css" />
 </head>
 
 <body>
-    <div class="container">
-        <h1>Oráculo de Combate</h1>
-        <p>Insira os dados do combate para prever a dificuldade.</p>
-
-        <form id="combat-form">
-            <div class="party-section">
-                <h2>Grupo dos Jogadores</h2>
-                <div class="form-group">
-                    <label for="num_player">Número de Jogadores</label>
-                    <input type="number" id="num_player" required>
-                </div>
-                <div class="form-group">
-                    <label for="level_players">Nível Médio dos Jogadores</label>
-                    <input type="number" id="level_players" required>
-                </div>
-                <div class="form-group">
-                    <label for="total_player_hp">Total de HP dos Jogadores</label>
-                    <input type="number" id="total_player_hp" required>
-                </div>
-                <div class="form-group">
-                    <label for="avg_player_ac">Média de CA dos Jogadores</label>
-                    <input type="number" id="avg_player_ac" required>
-                </div>
-                <div class="form-group">
-                    <label for="total_player_atk">Ataque Total dos Jogadores</label>
-                    <input type="number" id="total_player_atk" required>
-                </div>
-                <div class="form-group">
-                    <label for="total_player_damage">Dano total dos Jogadores</label>
-                    <input type="number" id="total_player_damage" required>
-                </div>
-            </div>
-
-            <div class="monster-section">
-                <h2>Grupo dos Monstros</h2>
-                <div class="form-group">
-                    <label for="num_enemy">Número de Monstros</label>
-                    <input type="number" id="num_enemy" required>
-                </div>
-                <div class="form-group">
-                    <label for="level_enemies">Nível Médio dos Monstros</label>
-                    <input type="number" id="level_enemies" required>
-                </div>
-                <div class="form-group">
-                    <label for="total_enemy_hp">Total de HP dos Monstros</label>
-                    <input type="number" id="total_enemy_hp" required>
-                </div>
-                <div class="form-group">
-                    <label for="avg_enemy_ac">Média de CA dos Monstros</label>
-                    <input type="number" id="avg_enemy_ac" required>
-                </div>
-                <div class="form-group">
-                    <label for="total_enemy_atk">Ataque Total dos Monstros</label>
-                    <input type="number" id="total_enemy_atk" required>
-                </div>
-                <div class="form-group">
-                    <label for="total_enemy_damage">Dano total dos Monstros</label>
-                    <input type="number" id="total_enemy_damage" required>
-                </div>
-            </div>
-
-            <button type="submit">Analisar Dificuldade</button>
-        </form>
-
-        <div id="result-container" class="hidden">
-            <h2>Resultado da Análise</h2>
-            <p>Dificuldade: <span id="difficulty-result"></span></p>
-            <p>Chance de Vitória (Jogadores): <span id="probability-result"></span></p>
+  <main class="page">
+    <article class="grimorio">
+      <header class="grimorio-header">
+        <div class="title-wrap">
+          <h1>Oráculo de Combate</h1>
+          <p class="subtitle"><strong>Preveja a dificuldade do encontro — D&D 5e (auxiliar)</strong></p>
         </div>
-    </div>
+
+        <button id="guide-toggle" class="guide-btn" aria-expanded="false">📖 Guia do Oráculo</button>
+      </header>
+
+      <section id="guide-panel" class="guide-panel hidden" aria-hidden="true">
+        <h2>Como usar</h2>
+        <p>Preencha os campos com os valores totais ou médios quando solicitado. A clareza dos números melhora a previsão.</p>
+
+        <h3>Campos principais</h3>
+        <ul>
+          <li><strong>Número de Jogadores / Monstros:</strong> quantidade de entidades participantes.</li>
+          <li><strong>Nível Médio:</strong> nível médio do grupo (usar média aritmética dos níveis).</li>
+          <li><strong>Total de HP:</strong> soma dos pontos de vida do grupo.</li>
+          <li><strong>Média de CA:</strong> média das classes de armadura do grupo.</li>
+          <li><strong>Ataque Total / Dano Total:</strong> soma dos bônus de ataque e soma média de dano por rodada (por todos os membros).</li>
+        </ul>
+        <p>Exemplo:</p>
+        <ul>
+          <li><strong>Número de Jogadores / Monstros:</strong>5 jogadores / 6 monstros </li>
+          <li><strong>Nível Médio:</strong> 12 / 12 </li>
+          <li><strong>Total de HP:</strong> 520 / 605 </li>
+          <li><strong>Média de CA:</strong> 10 / 12 </li>
+          <li><strong>Ataque Total / Dano Total:</strong> 55 / 84 | 62 / 90 </li>
+          <li><strong>Predição:</strong> Médio / 62.05%</li>
+        </ul>
+
+        <h3>O que o Oráculo faz</h3>
+        <p>Este preditor combina os parâmetros do grupo e dos inimigos para estimar uma <em>dificuldade</em> (ex: Fácil, Médio, Difícil, Mortal) e uma <em>probabilidade aproximada de vitória</em> dos jogadores. A previsão baseia‑se em heurísticas agregadas (HP, dano por rodada e acurácia) — não substitui o julgamento do mestre.</p>
+
+        <h3>Dicas</h3>
+        <ul>
+          <li>Use valores médios quando o grupo for heterogêneo.</li>
+          <li>Para encontros equilibrados, busque HP e dano total dos monstros na mesma ordem de magnitude do grupo.</li>
+          <li>Se quiser testar variações, duplique o encontro com mais inimigos ou aumente o dano dos monstros para ver o impacto na probabilidade.</li>
+        </ul>
+
+        <small class="muted">Nota: este é um auxílio heurístico — decisões finais cabem ao Mestre de Jogo.</small>
+      </section>
+
+      <form id="combat-form" class="combat-form" autocomplete="off">
+        <section class="party-section">
+          <h2 class="section-title">Grupo dos Jogadores</h2>
+
+          <label class="field">
+            <span><strong>Número de Jogadores</strong></span>
+            <input type="number" id="num_player" min="1" required>
+          </label>
+
+          <label class="field">
+            <span><strong>Nível Médio dos Jogadores</strong></span>
+            <input type="number" id="level_players" min="1" required>
+          </label>
+
+          <label class="field">
+            <span><strong>Total de HP dos Jogadores</strong></span>
+            <input type="number" id="total_player_hp" min="1" required>
+          </label>
+
+          <label class="field">
+            <span><strong>Média de CA dos Jogadores</strong></span>
+            <input type="number" id="avg_player_ac" min="0" step="0.1" required>
+          </label>
+
+          <label class="field">
+            <span><strong>Ataque Total dos Jogadores (Bônus somado)</strong></span>
+            <input type="number" id="total_player_atk" min="0" required>
+          </label>
+
+          <label class="field">
+            <span><strong>Dano total por rodada (média)</strong></span>
+            <input type="number" id="total_player_damage" min="0" required>
+          </label>
+        </section>
+
+        <section class="monster-section">
+          <h2 class="section-title">Grupo dos Monstros</h2>
+
+          <label class="field">
+            <span><strong>Número de Monstros</strong></span>
+            <input type="number" id="num_enemy" min="0" required>
+          </label>
+
+          <label class="field">
+            <span><strong>Nível Médio dos Monstros</strong></span>
+            <input type="number" id="level_enemies" min="0" required>
+          </label>
+
+          <label class="field">
+            <span><strong>Total de HP dos Monstros</strong></span>
+            <input type="number" id="total_enemy_hp" min="0" required>
+          </label>
+
+          <label class="field">
+            <span><strong>Média de CA dos Monstros</strong></span>
+            <input type="number" id="avg_enemy_ac" min="0" step="0.1" required>
+          </label>
+
+          <label class="field">
+            <span><strong>Ataque Total dos Monstros (Bônus somado)</strong></span>
+            <input type="number" id="total_enemy_atk" min="0" required>
+          </label>
+
+          <label class="field">
+            <span><strong>Dano total por rodada (média)</strong></span>
+            <input type="number" id="total_enemy_damage" min="0" required>
+          </label>
+        </section>
+
+        <div class="actions">
+          <button type="submit" class="primary">Analisar Dificuldade</button>
+          <button type="button" id="reset-btn" class="ghost">Limpar</button>
+        </div>
+      </form>
+
+      <section id="result-container" class="result-container hidden" aria-live="polite">
+        <div class="result-card">
+          <div class="result-left">
+            <h3>Resultado da Análise</h3>
+            <p class="result-row">Dificuldade: <strong id="difficulty-result">—</strong></p>
+            <p class="result-row">Chance de Vitória (Jogadores): <strong id="probability-result">—</strong></p>
+          </div>
+
+          <div class="result-right">
+            <div id="result-badge" class="result-badge">—</div>
+          </div>
+        </div>
+
+        <details class="explain">
+          <summary>Como essa previsão é estimada</summary>
+          <p>O Oráculo usa Machine Learning para prever a dificuldade do encontro. Ele transforma essas métricas numa escala probabilística e classifica em categorias de dificuldade. Isso serve como orientação — não é uma simulação rodada-a-rodada.</p>
+        </details>
+      </section>
+
+      <footer class="grimorio-footer">
+        <small>Feito para auxílio em mesa — mantenha o senso do Mestre.</small>
+      </footer>
+    </article>
+  </main>
+
+  <script src="script.js"></script>
 </body>
 
 </html>

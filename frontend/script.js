@@ -1,4 +1,6 @@
 document.addEventListener('DOMContentLoaded', () =>{
+    const guideToggle = document.getElementById('guide-toggle');
+    const guidePanel = document.getElementById('guide-panel');
     const combatForm = document.getElementById('combat-form');
     const resultContainer = document.getElementById('result-container');
     const difficultyResult = document.getElementById('difficulty-result');
@@ -44,5 +46,10 @@ document.addEventListener('DOMContentLoaded', () =>{
             console.error('Erro ao prever a dificuldade:', error);
             alert('Erro ao prever a dificuldade. Tente novamente.');
         }
+    })
+
+    guideToggle.addEventListener('click', () => {
+        guidePanel.classList.toggle('hidden');
+        guideToggle.setAttribute('aria-expanded', guidePanel.classList.contains('hidden'));
     })
 })
